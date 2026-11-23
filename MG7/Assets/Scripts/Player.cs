@@ -1,4 +1,7 @@
+using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class Player : MonoBehaviour
 {
@@ -52,7 +55,8 @@ public class Player : MonoBehaviour
         // Fix this line so that the Player GameObject is the PARENT of the seed.
         // That way, the seed will move with the player.
 
-        GameObject seed = Instantiate(_seedPrefab);
+        GameObject seed = Instantiate(_seedPrefab, transform);
+
 
         // STEP 4 -------------------------------------------------------------
 
@@ -67,6 +71,8 @@ public class Player : MonoBehaviour
         //      left and slightly above the player.
         // You will probably also need Transform.TransformDirection() ;)
 
+        Vector3 localOffset = (Vector3.left * _spawnLeft) + (Vector3.up * _spawnUp);
+        seed.transform.position = transform.position + transform.TransformDirection(localOffset);
         
         // STEP 5 -------------------------------------------------------------
     }
@@ -91,10 +97,14 @@ public class Player : MonoBehaviour
         // STEP 7 -------------------------------------------------------------
         // Set the animation parameters to play the throwing animation.
         
-
+        if (_animator != null)
+        {
+            _animator.SetTrigger("Throw");
+        }
 
         // STEP 7 -------------------------------------------------------------
     }
+
 
     // ------------------------------------------------------------------------
     private void LookAndMove()
@@ -113,7 +123,7 @@ public class Player : MonoBehaviour
         float horizontal = Input.GetAxis("Horizontal");
         transform.Translate(
             ((vertical * Vector3.forward) + (horizontal * Vector3.right))
-            * _moveSpeed * Time.deltaTime
+            * (_moveSpeed * Time.deltaTime)
         );
 
         // STEP 8 -------------------------------------------------------------
@@ -121,6 +131,11 @@ public class Player : MonoBehaviour
         // You might need the mouseY, mouseX, vertical, and horizontal variables
         //      that are above this step :)
 
+        if (_animator != null)
+        {
+            bool isMoving = vertical != 0f || horizontal != 0f;
+            _animator.SetBool("Walk", isMoving);
+        }
 
         // STEP 8 -------------------------------------------------------------
     }
